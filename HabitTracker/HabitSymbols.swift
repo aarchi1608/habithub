@@ -1,8 +1,6 @@
 //
-//  EventSymbols.swift
-//  HabitTracker
-//
-//  Created by Saikat Kumar Dey on 27/07/23.
+//  HabitSymbols.swift
+//  HabitHub
 //
 
 import Foundation

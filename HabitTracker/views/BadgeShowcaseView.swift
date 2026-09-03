@@ -1,6 +1,6 @@
 //
 //  BadgeShowcaseView.swift
-//  HabitTracker
+//  HabitHub
 //
 
 import SwiftUI
@@ -10,111 +10,123 @@ struct BadgeShowcaseView: View {
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Level & XP Hero 3D Card
-                    VStack(spacing: 16) {
-                        HStack(alignment: .center, spacing: 16) {
-                            ZStack {
-                                Circle()
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [.yellow, .orange],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
+            ZStack {
+                NoorBackgroundView()
+                
+                ScrollView {
+                    VStack(spacing: 22) {
+                        // Level & XP Hero Card
+                        VStack(spacing: 16) {
+                            HStack(alignment: .center, spacing: 16) {
+                                ZStack {
+                                    Circle()
+                                        .fill(
+                                            LinearGradient(
+                                                colors: [Color(hex: "#D4A359"), Color(hex: "#244E3F")],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
                                         )
-                                    )
-                                    .frame(width: 64, height: 64)
-                                    .shadow(color: .orange.opacity(0.6), radius: 10, x: 0, y: 5)
+                                        .frame(width: 60, height: 60)
+                                        .shadow(color: Color(hex: "#D4A359").opacity(0.3), radius: 8, x: 0, y: 4)
+                                    
+                                    Image(systemName: "crown.fill")
+                                        .font(.system(size: 26, weight: .bold))
+                                        .foregroundColor(.white)
+                                }
                                 
-                                Image(systemName: "crown.fill")
-                                    .font(.system(size: 30, weight: .bold))
-                                    .foregroundColor(.white)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack {
+                                        Text("LEVEL \(habitStore.userLevel)")
+                                            .font(.system(size: 11, weight: .heavy, design: .rounded))
+                                            .foregroundColor(Color(hex: "#244E3F"))
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 3)
+                                            .background(Capsule().fill(Color(hex: "#FBF3E6")).overlay(Capsule().stroke(Color(hex: "#E8D8C0"), lineWidth: 1)))
+                                        
+                                        Spacer()
+                                        
+                                        Text("\(habitStore.totalXP) XP")
+                                            .font(.system(size: 15, weight: .bold, design: .rounded))
+                                            .foregroundColor(Color(hex: "#2B2420"))
+                                    }
+                                    
+                                    Text(habitStore.levelTitle)
+                                        .font(.system(size: 20, weight: .bold, design: .serif))
+                                        .foregroundColor(Color(hex: "#2B2420"))
+                                }
                             }
                             
-                            VStack(alignment: .leading, spacing: 4) {
+                            // XP Progress to next level
+                            VStack(alignment: .leading, spacing: 6) {
                                 HStack {
-                                    Text("LEVEL \(habitStore.userLevel)")
-                                        .font(.system(size: 13, weight: .heavy, design: .rounded))
-                                        .foregroundColor(.orange)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 3)
-                                        .background(Capsule().fill(Color.orange.opacity(0.18)))
+                                    Text("Progress to Next Level")
+                                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                                        .foregroundColor(Color(hex: "#8C7A6B"))
                                     
                                     Spacer()
                                     
-                                    Text("\(habitStore.totalXP) XP")
-                                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                                        .foregroundColor(.primary)
+                                    Text("\(Int(habitStore.levelProgress * 100))%")
+                                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                                        .foregroundColor(Color(hex: "#244E3F"))
                                 }
                                 
-                                Text(habitStore.levelTitle)
-                                    .font(.system(size: 22, weight: .bold, design: .rounded))
-                                    .foregroundColor(.primary)
+                                GeometryReader { geo in
+                                    ZStack(alignment: .leading) {
+                                        Capsule()
+                                            .fill(Color(hex: "#EBE1D3"))
+                                            .frame(height: 8)
+                                        
+                                        Capsule()
+                                            .fill(
+                                                LinearGradient(
+                                                    colors: [Color(hex: "#244E3F"), Color(hex: "#D4A359")],
+                                                    startPoint: .leading,
+                                                    endPoint: .trailing
+                                                )
+                                            )
+                                            .frame(width: max(8, geo.size.width * CGFloat(habitStore.levelProgress)), height: 8)
+                                    }
+                                }
+                                .frame(height: 8)
                             }
                         }
+                        .padding(20)
+                        .noorCard(cornerRadius: 22)
                         
-                        // XP Progress to next level
-                        VStack(alignment: .leading, spacing: 6) {
+                        // Badges Grid
+                        VStack(alignment: .leading, spacing: 14) {
                             HStack {
-                                Text("Progress to Next Level")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                                Image(systemName: "trophy.fill")
+                                    .foregroundColor(Color(hex: "#D4A359"))
+                                Text("Achievement Badges")
+                                    .font(.system(size: 18, weight: .bold, design: .serif))
+                                    .foregroundColor(Color(hex: "#2B2420"))
+                                
                                 Spacer()
-                                Text("\(Int(habitStore.levelProgress * 100))%")
-                                    .font(.caption.bold())
-                                    .foregroundColor(.orange)
+                                
+                                Text("\(habitStore.allBadges.filter { $0.isUnlocked }.count)/\(habitStore.allBadges.count)")
+                                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                                    .foregroundColor(Color(hex: "#244E3F"))
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 3)
+                                    .background(Capsule().fill(Color(hex: "#FBF3E6")).overlay(Capsule().stroke(Color(hex: "#E8D8C0"), lineWidth: 1)))
                             }
                             
-                            GeometryReader { geo in
-                                ZStack(alignment: .leading) {
-                                    Capsule()
-                                        .fill(Color.gray.opacity(0.2))
-                                        .frame(height: 10)
-                                    Capsule()
-                                        .fill(
-                                            LinearGradient(
-                                                colors: [.yellow, .orange, .red],
-                                                startPoint: .leading,
-                                                endPoint: .trailing
-                                            )
-                                        )
-                                        .frame(width: max(10, geo.size.width * CGFloat(habitStore.levelProgress)), height: 10)
+                            LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], spacing: 14) {
+                                ForEach(habitStore.allBadges) { badge in
+                                    ThreeDBadgeCard(badge: badge)
                                 }
                             }
-                            .frame(height: 10)
                         }
                     }
-                    .padding(20)
-                    .background(Color(.secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-                    .threeDCardEffect(maxTilt: 12, isInteractive: true, cornerRadius: 22)
-                    
-                    // Badges Grid
-                    VStack(alignment: .leading, spacing: 14) {
-                        HStack {
-                            Image(systemName: "trophy.fill")
-                                .foregroundColor(.yellow)
-                            Text("3D Achievement Badges")
-                                .font(.system(size: 18, weight: .bold, design: .rounded))
-                            Spacer()
-                            Text("\(habitStore.allBadges.filter { $0.isUnlocked }.count)/\(habitStore.allBadges.count)")
-                                .font(.caption.bold())
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], spacing: 16) {
-                            ForEach(habitStore.allBadges) { badge in
-                                ThreeDBadgeCard(badge: badge)
-                            }
-                        }
-                    }
+                    .padding()
                 }
-                .padding()
             }
-            .navigationTitle("Trophy Room")
+            .navigationTitle("Trophies & Badges")
             .navigationBarTitleDisplayMode(.inline)
         }
+        .navigationViewStyle(.stack)
     }
 }
 

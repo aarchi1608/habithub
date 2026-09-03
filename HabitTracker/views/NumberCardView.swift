@@ -1,8 +1,6 @@
 //
 //  NumberCardView.swift
-//  HabitTracker
-//
-//  Created by Saikat Kumar Dey on 16/07/23.
+//  HabitHub
 //
 
 import SwiftUI

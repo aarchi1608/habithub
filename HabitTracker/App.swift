@@ -1,8 +1,6 @@
 //
-//  HabitTrackerApp.swift
-//  HabitTracker
-//
-//  Created by Saikat Kumar Dey on 01/07/23.
+//  App.swift
+//  HabitHub
 //
 
 import SwiftUI

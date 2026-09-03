@@ -1,8 +1,6 @@
 //
 //  EditHabitView.swift
-//  HabitTracker
-//
-//  Created by Saikat Kumar Dey on 09/07/23.
+//  HabitHub
 //
 
 import SwiftUI

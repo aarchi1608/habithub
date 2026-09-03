@@ -41,6 +41,8 @@
 		9A00000C2B00000100000002 /* ThreeDBreathingOrbView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A00000C2B00000100000001 /* ThreeDBreathingOrbView.swift */; };
 		9A00000D2B00000100000002 /* MoodTrackerCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A00000D2B00000100000001 /* MoodTrackerCardView.swift */; };
 		9A00000E2B00000100000002 /* RoutineStackFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A00000E2B00000100000001 /* RoutineStackFlowView.swift */; };
+		9A00000F2B00000100000002 /* NoorCardModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A00000F2B00000100000001 /* NoorCardModifier.swift */; };
+		9A0000102B00000100000002 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A0000102B00000100000001 /* DashboardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,6 +101,8 @@
 		9A00000C2B00000100000001 /* ThreeDBreathingOrbView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeDBreathingOrbView.swift; sourceTree = "<group>"; };
 		9A00000D2B00000100000001 /* MoodTrackerCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodTrackerCardView.swift; sourceTree = "<group>"; };
 		9A00000E2B00000100000001 /* RoutineStackFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineStackFlowView.swift; sourceTree = "<group>"; };
+		9A00000F2B00000100000001 /* NoorCardModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoorCardModifier.swift; sourceTree = "<group>"; };
+		9A0000102B00000100000001 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,6 +152,8 @@
 				9A00000C2B00000100000001 /* ThreeDBreathingOrbView.swift */,
 				9A00000D2B00000100000001 /* MoodTrackerCardView.swift */,
 				9A00000E2B00000100000001 /* RoutineStackFlowView.swift */,
+				9A00000F2B00000100000001 /* NoorCardModifier.swift */,
+				9A0000102B00000100000001 /* DashboardView.swift */,
 			);
 			path = views;
 			sourceTree = "<group>";
@@ -368,6 +374,8 @@
 				9A00000C2B00000100000002 /* ThreeDBreathingOrbView.swift in Sources */,
 				9A00000D2B00000100000002 /* MoodTrackerCardView.swift in Sources */,
 				9A00000E2B00000100000002 /* RoutineStackFlowView.swift in Sources */,
+				9A00000F2B00000100000002 /* NoorCardModifier.swift in Sources */,
+				9A0000102B00000100000002 /* DashboardView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -523,10 +531,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGNING_REQUIRED = NO;
 				CURRENT_PROJECT_VERSION = 1.2.0;
 				DEVELOPMENT_ASSET_PATHS = "\"HabitTracker/Preview Content\"";
-				DEVELOPMENT_TEAM = B8JD4KN6R9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HabitTracker/Info.plist;
@@ -545,7 +554,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.saikatkumardey.indiehabits;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aarchi.habithub;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -563,10 +572,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGNING_REQUIRED = NO;
 				CURRENT_PROJECT_VERSION = 1.2.0;
 				DEVELOPMENT_ASSET_PATHS = "\"HabitTracker/Preview Content\"";
-				DEVELOPMENT_TEAM = B8JD4KN6R9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HabitTracker/Info.plist;
@@ -585,7 +595,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.saikatkumardey.indiehabits;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aarchi.habithub;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -607,7 +617,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.saikatkumardey.HabitTrackerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aarchi.HabitTrackerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -626,7 +636,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.saikatkumardey.HabitTrackerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aarchi.HabitTrackerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -643,7 +653,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.saikatkumardey.HabitTrackerUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aarchi.HabitTrackerUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -660,7 +670,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.saikatkumardey.HabitTrackerUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aarchi.HabitTrackerUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;

@@ -92,5 +92,5 @@ A next-generation, immersive habit-tracking iOS app built with **SwiftUI**, feat
    ```bash
    xcodebuild -project HabitTracker.xcodeproj -scheme HabitTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -derivedDataPath ./build CODE_SIGNING_ALLOWED=NO build
    xcrun simctl install booted ./build/Build/Products/Debug-iphonesimulator/HabitTracker.app
-   xcrun simctl launch booted com.saikatkumardey.indiehabits
+   xcrun simctl launch booted com.aarchi.habithub
    ```

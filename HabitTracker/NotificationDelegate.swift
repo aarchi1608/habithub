@@ -1,8 +1,6 @@
 //
 //  NotificationDelegate.swift
-//  HabitTracker
-//
-//  Created by Saikat Kumar Dey on 04/07/23.
+//  HabitHub
 //
 
 import SwiftUI

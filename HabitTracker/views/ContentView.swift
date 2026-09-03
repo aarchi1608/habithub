@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  HabitTracker
+//  HabitHub
 //
 
 import SwiftUI
@@ -33,7 +33,7 @@ struct CurrentHabitsView: View {
     var body: some View {
         HabitListView(habits: uncompletedHabits, isCompleted: false)
             .environmentObject(habitStore)
-            .navigationTitle("HabitHub")
+            .navigationTitle("Habits")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 UNUserNotificationCenter.current().getNotificationSettings { settings in
@@ -69,7 +69,6 @@ struct HabitsMasterView: View {
     @EnvironmentObject var habitStore: HabitStore
     @StateObject private var themeManager = ThemeManager.shared
     @State private var selectedSegment: Int = 0
-    @State private var showingThemeSheet: Bool = false
     
     var body: some View {
         NavigationView {
@@ -81,7 +80,8 @@ struct HabitsMasterView: View {
                 }
                 .pickerStyle(.segmented)
                 .padding(.horizontal)
-                .padding(.top, 4)
+                .padding(.top, 6)
+                .padding(.bottom, 4)
                 
                 if selectedSegment == 0 {
                     CurrentHabitsView()
@@ -89,6 +89,7 @@ struct HabitsMasterView: View {
                     CompletedHabitsView()
                 }
             }
+            .background(NoorBackgroundView())
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -112,19 +113,19 @@ struct HabitsMasterView: View {
                     } label: {
                         HStack(spacing: 4) {
                             Circle()
-                                .fill(LinearGradient(colors: themeManager.currentTheme.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing))
+                                .fill(themeManager.currentTheme.primaryAccent)
                                 .frame(width: 14, height: 14)
-                                .shadow(color: themeManager.currentTheme.primaryAccent.opacity(0.6), radius: 4)
                             Image(systemName: "paintpalette.fill")
-                                .font(.system(size: 14))
+                                .font(.system(size: 13))
                                 .foregroundColor(themeManager.currentTheme.primaryAccent)
                         }
                         .padding(6)
-                        .background(Capsule().fill(Color(.systemGray6)))
+                        .background(Capsule().fill(Color(hex: "#FBF3E6")).overlay(Capsule().stroke(Color(hex: "#E8D8C0"), lineWidth: 1)))
                     }
                 }
             }
         }
+        .navigationViewStyle(.stack)
     }
 }
 
@@ -135,9 +136,14 @@ struct ContentView: View {
     var body: some View {
         ZStack {
             TabView {
+                DashboardView()
+                    .tabItem {
+                        Label("Dashboard", systemImage: "square.grid.2x2.fill")
+                    }
+                
                 HabitsMasterView()
                     .tabItem {
-                        Label("Habits", systemImage: "checklist")
+                        Label("Habits", systemImage: "leaf.fill")
                     }
                 
                 FocusTimerView()
@@ -157,7 +163,7 @@ struct ContentView: View {
             }
             .accentColor(themeManager.currentTheme.primaryAccent)
             
-            // Global 3D Confetti Burst Overlay
+            // Global Confetti Burst Overlay
             ConfettiBurstView(trigger: $habitStore.celebrationTrigger)
         }
     }

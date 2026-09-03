@@ -1,93 +1,48 @@
 //
 //  ThemeManager.swift
-//  HabitTracker
+//  HabitHub
 //
 
 import SwiftUI
 
 enum AppTheme: String, CaseIterable, Identifiable {
-    case neonNebula = "Neon Nebula"
-    case cyberpunk = "Cyberpunk"
-    case sunsetBlaze = "Sunset Blaze"
-    case aurora = "Aurora Mint"
-    case cosmic = "Cosmic Violet"
-    case solar = "Solar Gold"
-    case midnight = "Midnight Dark"
+    case noorEmerald = "✨ Noor Emerald & Gold"
+    case sandIvory = "📜 Sand Ivory"
+    case midnightForest = "🌲 Midnight Forest"
+    case amberWarmth = "☀️ Amber Warmth"
+    case royalTeal = "🌊 Royal Teal"
     
     var id: String { rawValue }
     
     var primaryAccent: Color {
         switch self {
-        case .neonNebula: return Color(hex: "#8B5CF6")
-        case .cyberpunk: return Color(hex: "#06B6D4")
-        case .sunsetBlaze: return Color(hex: "#F97316")
-        case .aurora: return Color(hex: "#10B981")
-        case .cosmic: return Color(hex: "#EC4899")
-        case .solar: return Color(hex: "#F59E0B")
-        case .midnight: return Color(hex: "#6366F1")
+        case .noorEmerald: return Color(hex: "#244E3F")
+        case .sandIvory: return Color(hex: "#C79546")
+        case .midnightForest: return Color(hex: "#1A3D31")
+        case .amberWarmth: return Color(hex: "#D97706")
+        case .royalTeal: return Color(hex: "#0F766E")
         }
     }
     
-    var secondaryAccent: Color {
+    var goldAccent: Color {
+        return Color(hex: "#D4A359")
+    }
+    
+    var backgroundColors: [Color] {
         switch self {
-        case .neonNebula: return Color(hex: "#EC4899")
-        case .cyberpunk: return Color(hex: "#EAB308")
-        case .sunsetBlaze: return Color(hex: "#EF4444")
-        case .aurora: return Color(hex: "#06B6D4")
-        case .cosmic: return Color(hex: "#8B5CF6")
-        case .solar: return Color(hex: "#EF4444")
-        case .midnight: return Color(hex: "#A855F7")
+        case .noorEmerald, .sandIvory, .amberWarmth:
+            return [Color(hex: "#FBF8F3"), Color(hex: "#F6EFE5"), Color(hex: "#EFE6D8")]
+        case .midnightForest, .royalTeal:
+            return [Color(hex: "#0A1712"), Color(hex: "#12261F"), Color(hex: "#08120E")]
         }
     }
     
-    var gradientColors: [Color] {
-        [primaryAccent, secondaryAccent]
-    }
-    
-    var backgroundGradient: LinearGradient {
+    var cardBackground: Color {
         switch self {
-        case .neonNebula:
-            return LinearGradient(
-                colors: [Color(hex: "#0D0B18"), Color(hex: "#16102B"), Color(hex: "#080611")],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        case .cyberpunk:
-            return LinearGradient(
-                colors: [Color(hex: "#07111E"), Color(hex: "#0B1D2C"), Color(hex: "#040910")],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        case .sunsetBlaze:
-            return LinearGradient(
-                colors: [Color(hex: "#1A0A10"), Color(hex: "#260F16"), Color(hex: "#0F0509")],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        case .aurora:
-            return LinearGradient(
-                colors: [Color(hex: "#061512"), Color(hex: "#0A241E"), Color(hex: "#040D0B")],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        case .cosmic:
-            return LinearGradient(
-                colors: [Color(hex: "#150A21"), Color(hex: "#220F35"), Color(hex: "#0C0514")],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        case .solar:
-            return LinearGradient(
-                colors: [Color(hex: "#181205"), Color(hex: "#261D09"), Color(hex: "#0E0A03")],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        case .midnight:
-            return LinearGradient(
-                colors: [Color(hex: "#0A0C14"), Color(hex: "#121724"), Color(hex: "#05070A")],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+        case .noorEmerald, .sandIvory, .amberWarmth:
+            return Color(hex: "#FFFFFF")
+        default:
+            return Color(hex: "#142820").opacity(0.8)
         }
     }
 }
@@ -95,15 +50,20 @@ enum AppTheme: String, CaseIterable, Identifiable {
 class ThemeManager: ObservableObject {
     static let shared = ThemeManager()
     
-    @AppStorage("selected_app_theme") var currentThemeRaw: String = AppTheme.neonNebula.rawValue
+    private let storageKey = "habithub_selected_app_theme"
     
-    var currentTheme: AppTheme {
-        get {
-            AppTheme(rawValue: currentThemeRaw) ?? .neonNebula
+    @Published var currentTheme: AppTheme {
+        didSet {
+            UserDefaults.standard.set(currentTheme.rawValue, forKey: storageKey)
         }
-        set {
-            currentThemeRaw = newValue.rawValue
-            objectWillChange.send()
+    }
+    
+    private init() {
+        if let savedTheme = UserDefaults.standard.string(forKey: storageKey),
+           let theme = AppTheme(rawValue: savedTheme) {
+            self.currentTheme = theme
+        } else {
+            self.currentTheme = .noorEmerald
         }
     }
 }

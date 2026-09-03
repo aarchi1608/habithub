@@ -1,45 +1,116 @@
 //
 //  Onboarding.swift
-//  HabitTracker
+//  HabitHub
 //
-//  Created by Saikat Kumar Dey on 29/07/23.
-//
+
 import SwiftUI
+
+struct OnboardingItem: Identifiable {
+    var id = UUID()
+    var title: String
+    var subtitle: String
+    var icon: String
+    var colors: [Color]
+}
 
 struct OnboardingView: View {
     @Binding var hasCompletedOnboarding: Bool
     @State private var currentPage = 0
     
+    private let pages: [OnboardingItem] = [
+        OnboardingItem(
+            title: "Welcome to HabitHub",
+            subtitle: "Build atomic habits, master your daily discipline, and unlock your true potential.",
+            icon: "sparkles",
+            colors: [.purple, .blue]
+        ),
+        OnboardingItem(
+            title: "3D Spatial Tracking",
+            subtitle: "Interact with 3D Habit Cubes, gyroscope streak orbs, and holographic trophy badges.",
+            icon: "cube.transparent.fill",
+            colors: [.cyan, .blue]
+        ),
+        OnboardingItem(
+            title: "Routines & Focus Timer",
+            subtitle: "Execute guided habit routine stacks with ambient focus soundscapes & 3D breathing.",
+            icon: "timer",
+            colors: [.orange, .red]
+        ),
+        OnboardingItem(
+            title: "You're All Set!",
+            subtitle: "Start building your unshakeable daily consistency streak right now.",
+            icon: "checkmark.seal.fill",
+            colors: [.green, .mint]
+        )
+    ]
+    
     var body: some View {
-        VStack {
-            TabView(selection: $currentPage) {
-                WelcomeView()
-                    .tag(0)
-                FeatureView(
-                    feature: "Add",
-                    description: "Easily add habits you want to build, set reminders, and track your progress.",
-                    imageName: "OnboardingAdd"
-                )
-                .tag(1)
-                FeatureView(
-                    feature: "Track",
-                    description: "Keep track of your habits and see your progress over time.",
-                    imageName: "OnboardingTrack"
-                )
-                .tag(2)
-                FeatureView(
-                    feature: "You're all set!",
-                    description: "Start building and tracking habits now.",
-                    imageName: "OnboardingFinal"
-                )
-                .tag(3)
-            }
-            .tabViewStyle(PageTabViewStyle())
-            .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .interactive))
+        ZStack {
+            Color(.systemBackground).ignoresSafeArea()
             
-            HStack{
+            VStack(spacing: 24) {
+                TabView(selection: $currentPage) {
+                    ForEach(0..<pages.count, id: \.self) { index in
+                        let item = pages[index]
+                        VStack(spacing: 24) {
+                            Spacer()
+                            
+                            // 3D Card Icon
+                            ZStack {
+                                Circle()
+                                    .fill(
+                                        RadialGradient(
+                                            colors: [item.colors.first?.opacity(0.35) ?? .purple, Color.clear],
+                                            center: .center,
+                                            startRadius: 20,
+                                            endRadius: 100
+                                        )
+                                    )
+                                    .frame(width: 200, height: 200)
+                                    .blur(radius: 10)
+                                
+                                Circle()
+                                    .fill(
+                                        LinearGradient(
+                                            colors: item.colors,
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .frame(width: 120, height: 120)
+                                    .shadow(color: item.colors.first?.opacity(0.5) ?? .purple, radius: 15, x: 0, y: 8)
+                                
+                                Image(systemName: item.icon)
+                                    .font(.system(size: 52, weight: .bold))
+                                    .foregroundColor(.white)
+                            }
+                            .threeDCardEffect(maxTilt: 15, isInteractive: true, cornerRadius: 60)
+                            
+                            VStack(spacing: 10) {
+                                Text(item.title)
+                                    .font(.system(size: 28, weight: .heavy, design: .rounded))
+                                    .foregroundColor(.primary)
+                                    .multilineTextAlignment(.center)
+                                
+                                Text(item.subtitle)
+                                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, 32)
+                            }
+                            
+                            Spacer()
+                        }
+                        .tag(index)
+                    }
+                }
+                .tabViewStyle(PageTabViewStyle())
+                .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
+                
+                // Bottom Action Button
                 Button(action: {
-                    if currentPage < 3 {
+                    SoundHapticManager.shared.lightImpact()
+                    if currentPage < pages.count - 1 {
                         withAnimation {
                             currentPage += 1
                         }
@@ -47,102 +118,31 @@ struct OnboardingView: View {
                         hasCompletedOnboarding = true
                     }
                 }) {
-                    Text(currentPage == 3 ? "Get Started" : "Next")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .padding(.horizontal,10)
-                        .padding(.vertical,5)
+                    Text(currentPage == pages.count - 1 ? "Get Started" : "Continue")
+                        .font(.system(size: 17, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            LinearGradient(
+                                colors: pages[currentPage].colors,
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .shadow(color: pages[currentPage].colors.first?.opacity(0.4) ?? .blue, radius: 10, x: 0, y: 5)
+                        .padding(.horizontal, 24)
                 }
-                .buttonStyle(.bordered)
-                
-                if currentPage > 0 && currentPage < 3 {
-                    Button(action: {
-                        hasCompletedOnboarding = true
-                    }) {
-                        Text("Skip")
-                            .font(.title)
-                            .foregroundColor(.secondary)
-                            .underline()
-                            .fontWeight(.light)
-                            .padding(.horizontal,10)
-                            .padding(.vertical,5)
-                    }
-                }
+                .padding(.bottom, 20)
             }
         }
     }
 }
 
-struct WelcomeView: View {
-    var body: some View {
-        
-        // Welcome message
-        VStack {
-            Image("WelcomeIcon")
-                .resizable()
-                .frame(width: 200, height: 200)
-                .padding(.bottom, -20)
-            
-            Text("Welcome to HabitHub")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .fontDesign(.rounded)
-                .foregroundColor(.primary)
-            Text("Small habits, big results.")
-                .font(.subheadline)
-                .fontWeight(.light)
-                .fontDesign(.rounded)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-        }
-    }
-}
-
-struct FeatureView: View {
-    var feature: String
-    var description: String
-    var imageName: String
-    
-    var body: some View {
-        VStack {
-            Text(feature)
-                .font(.title)
-                .padding(.bottom,5)
-            
-            Image(imageName)
-                .resizable()
-                .scaledToFit()
-                .shadow(color: .gray,radius:5)
-                .clipShape(RoundedRectangle(cornerRadius: 20))
-            
-            Spacer()
-            
-            //            Text(description)
-            //                .font(.body)
-            //                .multilineTextAlignment(.center)
-            //                .padding(.bottom,30)
-            //            Spacer()
-        }
-    }
-}
-
-struct GetStartedView: View {
-    var body: some View {
-        VStack {
-            Text("You're all set!")
-                .font(.largeTitle)
-            Text("Start exploring the app now.")
-                .font(.body)
-        }
-    }
-}
-
-// preview
 struct OnboardingView_Previews: PreviewProvider {
     static var previews: some View {
         OnboardingView(hasCompletedOnboarding: .constant(false))
-            .preferredColorScheme(.light)
-            .background(.green.opacity(0.1))
+            .preferredColorScheme(.dark)
     }
 }
-

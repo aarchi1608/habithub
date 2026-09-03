@@ -1,8 +1,6 @@
 //
 //  DateSelectionView.swift
-//  HabitTracker
-//
-//  Created by Saikat Kumar Dey on 18/07/23.
+//  HabitHub
 //
 
 import SwiftUI

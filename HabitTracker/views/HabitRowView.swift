@@ -1,156 +1,122 @@
 //
 //  HabitRowView.swift
-//  HabitTracker
-//
-//  Created by Saikat Kumar Dey on 09/07/23.
+//  HabitHub
 //
 
 import SwiftUI
 
 struct HabitRow: View {
-    @Environment(\.scenePhase) var scenePhase
-    @Environment(\.colorScheme) var colorScheme
-    @EnvironmentObject var habitStore: HabitStore
     @ObservedObject var habit: Habit
-    
-    @State private var lastNdays = [Int]()
-    @State private var isCheckmarkPressed = false
+    @EnvironmentObject var habitStore: HabitStore
     
     var body: some View {
         HStack(spacing: 14) {
-            // Quick-Complete Action Checkmark Button
-            Button(action: {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
-                    isCheckmarkPressed = true
-                }
-                habitStore.toggleHabitQuick(habit)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                        isCheckmarkPressed = false
+            // Amber/Gold Icon Container
+            ZStack {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Color(hex: "#FBF3E6"))
+                    .frame(width: 44, height: 44)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .stroke(Color(hex: "#E8D8C0"), lineWidth: 1)
+                    )
+                
+                Image(systemName: habit.symbol)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(Color(hex: "#C79546"))
+            }
+            
+            // Title & Duration / Category
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 8) {
+                    Text(habit.title)
+                        .font(.system(size: 16, weight: .semibold, design: .serif))
+                        .foregroundColor(Color(hex: "#2B2420"))
+                        .strikethrough(habit.isHabitCompleted, color: Color(hex: "#244E3F").opacity(0.6))
+                        .lineLimit(1)
+                    
+                    if habit.targetMinutes > 0 {
+                        Text("\(habit.targetMinutes) min")
+                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                            .foregroundColor(Color(hex: "#C79546"))
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(
+                                Capsule()
+                                    .fill(Color(hex: "#FBF3E6"))
+                            )
                     }
                 }
-            }) {
+                
+                HStack(spacing: 6) {
+                    Text(habit.category.rawValue)
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundColor(Color(hex: "#8C7A6B"))
+                    
+                    Text("•")
+                        .font(.system(size: 9))
+                        .foregroundColor(Color(hex: "#C2B5A5"))
+                    
+                    Text("\(habit.calculateStreak())d streak")
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        .foregroundColor(Color(hex: "#244E3F"))
+                }
+            }
+            
+            Spacer()
+            
+            // Circular Checkmark Button
+            Button {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.6)) {
+                    habitStore.toggleHabitQuick(habit)
+                }
+            } label: {
                 ZStack {
                     Circle()
                         .fill(
                             habit.isHabitCompleted ?
-                            LinearGradient(
-                                colors: [habit.color, habit.color.opacity(0.8)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                            :
-                            LinearGradient(
-                                colors: [Color.gray.opacity(0.12), Color.gray.opacity(0.08)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
+                            Color(hex: "#244E3F") :
+                            Color(hex: "#FBF8F3")
                         )
-                        .frame(width: 44, height: 44)
+                        .frame(width: 34, height: 34)
+                        .overlay(
+                            Circle()
+                                .stroke(
+                                    habit.isHabitCompleted ?
+                                    Color(hex: "#244E3F") :
+                                    Color(hex: "#D4A359").opacity(0.5),
+                                    lineWidth: 1.5
+                                )
+                        )
                         .shadow(
-                            color: habit.isHabitCompleted ? habit.color.opacity(0.4) : Color.clear,
-                            radius: 8,
+                            color: habit.isHabitCompleted ? Color(hex: "#244E3F").opacity(0.3) : Color.clear,
+                            radius: 4,
                             x: 0,
-                            y: 4
+                            y: 2
                         )
                     
                     if habit.isHabitCompleted {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 18, weight: .bold))
+                            .font(.system(size: 13, weight: .bold))
                             .foregroundColor(.white)
-                    } else {
-                        Image(systemName: habit.symbol)
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(colorScheme == .dark && habit.color == .black ? .primary : habit.color)
                     }
                 }
-                .scaleEffect(isCheckmarkPressed ? 0.82 : 1.0)
             }
             .buttonStyle(.plain)
-            
-            // Habit Info & Category Pill
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 6) {
-                    Text(habit.title)
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
-                        .foregroundColor(habit.isHabitCompleted ? .secondary : .primary)
-                        .strikethrough(habit.isHabitCompleted, color: .secondary)
-                    
-                    Spacer()
-                    
-                    // Streak Pill
-                    HStack(spacing: 3) {
-                        Image(systemName: "flame.fill")
-                            .font(.system(size: 11))
-                            .foregroundColor(.orange)
-                        Text("\(habit.calculateStreak())")
-                            .font(.system(size: 12, weight: .bold, design: .rounded))
-                            .foregroundColor(.orange)
-                    }
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 3)
-                    .background(Capsule().fill(Color.orange.opacity(0.12)))
-                }
-                
-                HStack(spacing: 8) {
-                    // Category Tag
-                    HStack(spacing: 3) {
-                        Image(systemName: habit.category.icon)
-                            .font(.system(size: 9))
-                        Text(habit.category.rawValue)
-                            .font(.system(size: 10, weight: .medium, design: .rounded))
-                    }
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(
-                        Capsule()
-                            .fill(LinearGradient(colors: habit.category.gradientColors, startPoint: .leading, endPoint: .trailing).opacity(0.15))
-                    )
-                    .foregroundColor(habit.category.gradientColors.first ?? .blue)
-                    
-                    // Reminder Time
-                    HStack(spacing: 3) {
-                        Image(systemName: "clock")
-                            .font(.system(size: 9))
-                        Text(habit.startDate.formatted(date: .omitted, time: .shortened))
-                            .font(.system(size: 10, design: .rounded))
-                    }
-                    .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    // 7-Day History Dots
-                    HStack(spacing: 4) {
-                        ForEach(0..<lastNdays.count, id: \.self) { index in
-                            let cell = lastNdays[index]
-                            Circle()
-                                .fill(
-                                    cell == 1 ? Color.green : (index == lastNdays.count - 1 && cell == 0 ? Color.gray.opacity(0.3) : Color.red.opacity(0.6))
-                                )
-                                .frame(width: 6, height: 6)
-                        }
-                    }
-                }
-            }
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 4)
-        .onAppear {
-            lastNdays = habit.lastNdayCells(n: 7)
-        }
-        .onChange(of: scenePhase) { phase in
-            if phase == .active {
-                lastNdays = habit.lastNdayCells(n: 7)
-            }
-        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .noorCard(cornerRadius: 16)
     }
 }
 
 struct HabitRow_Previews: PreviewProvider {
     static var previews: some View {
-        HabitRow(habit: Habit(title: "Morning Meditation", completedDates: [], startDate: Date()))
-            .environmentObject(HabitStore())
-            .padding()
-            .previewLayout(.sizeThatFits)
+        ZStack {
+            NoorBackgroundView()
+            HabitRow(habit: Habit(title: "Morning Reflection", category: .mindset))
+                .environmentObject(HabitStore())
+                .padding()
+        }
     }
 }

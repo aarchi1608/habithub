@@ -1,8 +1,6 @@
 //
-//  ReminderConfiguration.swift
-//  HabitTracker
-//
-//  Created by Saikat Kumar Dey on 06/07/23.
+//  ReminderConfigurationView.swift
+//  HabitHub
 //
 
 import Foundation

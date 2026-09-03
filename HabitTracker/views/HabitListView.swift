@@ -1,8 +1,6 @@
 //
 //  HabitListView.swift
-//  HabitTracker
-//
-//  Created by Saikat Kumar Dey on 09/07/23.
+//  HabitHub
 //
 
 import SwiftUI
@@ -18,6 +16,7 @@ struct HabitListView: View {
     @State private var searchKeyword: String = ""
     @State private var selectedRoutineForFlow: String? = nil
     @State private var showShieldAlert: Bool = false
+    @State private var showReflectionSheet: Bool = false
     
     enum SortOrder {
         case startDate, totalCompleted, longestStreak, currentStreak, reminderTime
@@ -58,258 +57,307 @@ struct HabitListView: View {
         }
     }
     
+    private var maxCurrentStreak: Int {
+        habitStore.habits.map { $0.calculateStreak() }.max() ?? 0
+    }
+    
     var body: some View {
-        VStack(spacing: 0) {
-            // Category Filter Pills & Routine Stacks
-            VStack(spacing: 10) {
-                // Category Pills
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        Button(action: {
-                            selectedCategoryFilter = nil
-                            SoundHapticManager.shared.lightImpact()
-                        }) {
-                            Text("All")
-                                .font(.system(size: 12, weight: .bold, design: .rounded))
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(
-                                    Capsule()
-                                        .fill(selectedCategoryFilter == nil ? Color.primary : Color(.systemGray6))
-                                )
-                                .foregroundColor(selectedCategoryFilter == nil ? Color(.systemBackground) : .primary)
-                        }
-                        
-                        ForEach(HabitCategory.allCases) { cat in
-                            Button(action: {
-                                selectedCategoryFilter = (selectedCategoryFilter == cat) ? nil : cat
-                                SoundHapticManager.shared.lightImpact()
-                            }) {
-                                HStack(spacing: 4) {
-                                    Image(systemName: cat.icon)
-                                        .font(.system(size: 10))
-                                    Text(cat.rawValue)
-                                        .font(.system(size: 12, weight: .bold, design: .rounded))
+        ZStack {
+            NoorBackgroundView()
+            
+            ScrollView {
+                VStack(spacing: 20) {
+                    if !isCompleted {
+                        // MARK: - 1. Noor Emerald Streak Ring Hero Card
+                        HStack(spacing: 20) {
+                            // Circular Streak Ring
+                            ZStack {
+                                Circle()
+                                    .stroke(Color.white.opacity(0.15), lineWidth: 8)
+                                    .frame(width: 100, height: 100)
+                                
+                                Circle()
+                                    .trim(from: 0, to: CGFloat(min(1.0, Double(maxCurrentStreak) / 7.0)))
+                                    .stroke(
+                                        LinearGradient(
+                                            colors: [Color(hex: "#D4A359"), Color(hex: "#FCE7C8"), Color(hex: "#D4A359")],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                                    )
+                                    .frame(width: 100, height: 100)
+                                    .rotationEffect(.degrees(-90))
+                                    .shadow(color: Color(hex: "#D4A359").opacity(0.6), radius: 8)
+                                
+                                VStack(spacing: 2) {
+                                    Text("\(maxCurrentStreak)")
+                                        .font(.system(size: 32, weight: .bold, design: .serif))
+                                        .foregroundColor(Color(hex: "#FBF8F3"))
+                                    
+                                    Text("Day Streak")
+                                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                                        .foregroundColor(Color(hex: "#D4A359"))
                                 }
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(
-                                    Capsule()
-                                        .fill(selectedCategoryFilter == cat ? (cat.gradientColors.first ?? .blue) : Color(.systemGray6))
-                                )
-                                .foregroundColor(selectedCategoryFilter == cat ? .white : .primary)
                             }
+                            .padding(.leading, 8)
+                            
+                            // Streak Motivation Text
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Consistency Journey")
+                                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                                    .foregroundColor(Color(hex: "#D4A359"))
+                                    .textCase(.uppercase)
+                                    .tracking(1.0)
+                                
+                                Text("\(habitStore.habits.filter { $0.isHabitCompleted }.count) of \(habitStore.habits.count) Completed")
+                                    .font(.system(size: 18, weight: .bold, design: .serif))
+                                    .foregroundColor(.white)
+                                
+                                Text("Keep your unshakeable habit streak flourishing today.")
+                                    .font(.system(size: 11, design: .rounded))
+                                    .foregroundColor(Color.white.opacity(0.8))
+                                    .lineLimit(2)
+                            }
+                            
+                            Spacer()
+                        }
+                        .padding(18)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(hex: "#1B3B30"), Color(hex: "#244E3F"), Color(hex: "#1A382E")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                .stroke(Color(hex: "#D4A359").opacity(0.4), lineWidth: 1.2)
+                        )
+                        .shadow(color: Color(hex: "#1B3B30").opacity(0.25), radius: 10, x: 0, y: 5)
+                        .padding(.horizontal)
+                        
+                        // MARK: - 2. Noor "Today's Ayah / Wisdom" Reflection Card
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "sparkles")
+                                        .foregroundColor(Color(hex: "#D4A359"))
+                                    Text("Today's Wisdom")
+                                        .font(.system(size: 12, weight: .bold, design: .serif))
+                                        .foregroundColor(Color(hex: "#D4A359"))
+                                }
+                                Spacer()
+                                Button {
+                                    showReflectionSheet = true
+                                    SoundHapticManager.shared.lightImpact()
+                                } label: {
+                                    Text("Reflect")
+                                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                                        .foregroundColor(Color(hex: "#244E3F"))
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 4)
+                                        .background(Capsule().fill(Color(hex: "#D4A359")))
+                                }
+                            }
+                            
+                            Text("\"\(habitStore.dailyMotivationQuote.quote)\"")
+                                .font(.system(size: 15, weight: .medium, design: .serif))
+                                .foregroundColor(Color(hex: "#FBF8F3"))
+                                .lineSpacing(3)
+                            
+                            Text("— \(habitStore.dailyMotivationQuote.author)")
+                                .font(.system(size: 11, weight: .semibold, design: .serif))
+                                .foregroundColor(Color(hex: "#D4A359").opacity(0.9))
+                        }
+                        .padding(16)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(hex: "#224A3C"), Color(hex: "#2A5949")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                .stroke(Color(hex: "#D4A359").opacity(0.3), lineWidth: 1)
+                        )
+                        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 3)
+                        .padding(.horizontal)
+                        
+                        // MARK: - 3. Quick Access 4-Grid Cards
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Quick Access")
+                                .font(.system(size: 16, weight: .bold, design: .serif))
+                                .foregroundColor(Color(hex: "#2B2420"))
+                                .padding(.horizontal)
+                            
+                            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 4), spacing: 12) {
+                                quickAccessCard(icon: "sun.max.fill", title: "Mindset", color: Color(hex: "#D4A359")) {
+                                    selectedCategoryFilter = .mindset
+                                }
+                                quickAccessCard(icon: "leaf.fill", title: "Habits", color: Color(hex: "#244E3F")) {
+                                    selectedCategoryFilter = nil
+                                }
+                                quickAccessCard(icon: "timer", title: "Focus", color: Color(hex: "#C79546")) {
+                                    selectedCategoryFilter = .productivity
+                                }
+                                quickAccessCard(icon: "chart.bar.fill", title: "Insights", color: Color(hex: "#1E3F32")) {
+                                    selectedCategoryFilter = .learning
+                                }
+                            }
+                            .padding(.horizontal)
                         }
                     }
-                    .padding(.horizontal)
-                }
-                .padding(.top, 8)
-                
-                // Routine Stack Flow Quick-Launch Pills (Only in Active view)
-                if !isCompleted {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 8) {
-                            ForEach(habitStore.defaultRoutineStacks, id: \.self) { stack in
+                    
+                    // MARK: - 4. Habit Section Header & Category Filters
+                    VStack(spacing: 8) {
+                        HStack {
+                            Text(isCompleted ? "Completed Habits" : "Today's Habits")
+                                .font(.system(size: 18, weight: .bold, design: .serif))
+                                .foregroundColor(Color(hex: "#2B2420"))
+                            
+                            Spacer()
+                            
+                            // Shields Pill
+                            Button(action: {
+                                showShieldAlert = true
+                            }) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "shield.fill")
+                                        .font(.system(size: 10))
+                                    Text("\(habitStore.streakShieldsCount) Shields")
+                                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                                }
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .background(Capsule().fill(Color(hex: "#FBF3E6")))
+                                .foregroundColor(Color(hex: "#C79546"))
+                                .overlay(Capsule().stroke(Color(hex: "#E8D8C0"), lineWidth: 1))
+                            }
+                        }
+                        .padding(.horizontal)
+                        
+                        // Category Pills
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
                                 Button(action: {
-                                    selectedRoutineForFlow = stack
+                                    selectedCategoryFilter = nil
                                     SoundHapticManager.shared.lightImpact()
                                 }) {
-                                    HStack(spacing: 4) {
-                                        Image(systemName: "play.fill")
-                                            .font(.system(size: 9))
-                                        Text(stack)
-                                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                                    Text("All")
+                                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 6)
+                                        .background(
+                                            Capsule()
+                                                .fill(selectedCategoryFilter == nil ? Color(hex: "#244E3F") : Color(hex: "#FFFFFF"))
+                                        )
+                                        .foregroundColor(selectedCategoryFilter == nil ? .white : Color(hex: "#2B2420"))
+                                        .overlay(
+                                            Capsule().stroke(Color(hex: "#EBE1D3"), lineWidth: 1)
+                                        )
+                                }
+                                
+                                ForEach(HabitCategory.allCases) { cat in
+                                    Button(action: {
+                                        selectedCategoryFilter = (selectedCategoryFilter == cat) ? nil : cat
+                                        SoundHapticManager.shared.lightImpact()
+                                    }) {
+                                        HStack(spacing: 4) {
+                                            Image(systemName: cat.icon)
+                                                .font(.system(size: 10))
+                                            Text(cat.rawValue)
+                                                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                                        }
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .background(
+                                            Capsule()
+                                                .fill(selectedCategoryFilter == cat ? Color(hex: "#244E3F") : Color(hex: "#FFFFFF"))
+                                        )
+                                        .foregroundColor(selectedCategoryFilter == cat ? .white : Color(hex: "#2B2420"))
+                                        .overlay(
+                                            Capsule().stroke(Color(hex: "#EBE1D3"), lineWidth: 1)
+                                        )
                                     }
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 5)
-                                    .background(Capsule().fill(Color.purple.opacity(0.15)))
-                                    .foregroundColor(.purple)
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
+                    
+                    // MARK: - 5. Habits List Cards
+                    if habits.isEmpty {
+                        VStack(spacing: 16) {
+                            Spacer()
+                            Image(systemName: isCompleted ? "checkmark.seal.fill" : "sparkles")
+                                .font(.system(size: 48))
+                                .foregroundColor(Color(hex: "#D4A359"))
+                            
+                            Text(isCompleted ? "No habits completed yet." : "Begin your consistency journey.")
+                                .font(.system(size: 18, weight: .bold, design: .serif))
+                                .foregroundColor(Color(hex: "#2B2420"))
+                            
+                            if !isCompleted {
+                                Button(action: {
+                                    self.showingAddHabitSheet = true
+                                }) {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "plus.circle.fill")
+                                        Text("Add a Habit")
+                                    }
+                                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 22)
+                                    .padding(.vertical, 12)
+                                    .background(
+                                        Capsule()
+                                            .fill(Color(hex: "#244E3F"))
+                                            .shadow(color: Color(hex: "#244E3F").opacity(0.3), radius: 8, x: 0, y: 4)
+                                    )
+                                }
+                            }
+                            Spacer()
+                        }
+                        .padding(.vertical, 40)
+                    } else {
+                        VStack(spacing: 10) {
+                            ForEach(sortedHabits, id: \.id) { habit in
+                                NavigationLink(
+                                    destination: HabitDetailView()
+                                        .environmentObject(habit)
+                                        .environmentObject(habitStore)
+                                ) {
+                                    HabitRow(habit: habit)
+                                        .environmentObject(habitStore)
+                                }
+                                .buttonStyle(.plain)
+                                .contextMenu {
+                                    Button {
+                                        habitStore.toggleHabitQuick(habit)
+                                    } label: {
+                                        Label(
+                                            habit.isHabitCompleted ? "Unmark" : "Complete",
+                                            systemImage: habit.isHabitCompleted ? "arrow.uturn.backward" : "checkmark"
+                                        )
+                                    }
+                                    
+                                    Button(role: .destructive) {
+                                        selectedHabit = habit
+                                        self.showDeleteConfirmationAlert = true
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
                                 }
                             }
                         }
                         .padding(.horizontal)
                     }
                 }
-                
-                // Sort by Selector & Streak Shield Status
-                HStack {
-                    Text("\(sortedHabits.count) \(isCompleted ? "completed" : "active") habits")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    // Streak Shield Pill
-                    Button(action: {
-                        showShieldAlert = true
-                    }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "shield.fill")
-                                .font(.system(size: 10))
-                            Text("\(habitStore.streakShieldsCount) Shields")
-                                .font(.system(size: 11, weight: .bold, design: .rounded))
-                        }
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(Capsule().fill(Color.cyan.opacity(0.15)))
-                        .foregroundColor(.cyan)
-                    }
-                    
-                    Picker("Sort by", selection: $sortOrder) {
-                        Text("Start Date").tag(SortOrder.startDate)
-                        Text("Reminder Time").tag(SortOrder.reminderTime)
-                        Text("Completed Days").tag(SortOrder.totalCompleted)
-                        Text("Longest Streak").tag(SortOrder.longestStreak)
-                        Text("Current Streak").tag(SortOrder.currentStreak)
-                    }
-                    .pickerStyle(.menu)
-                    .font(.caption.bold())
-                }
-                .padding(.horizontal)
-            }
-            
-            if habits.isEmpty {
-                VStack(spacing: 20) {
-                    Spacer()
-                    Image(systemName: isCompleted ? "checkmark.circle.badge.questionmark" : "sparkles")
-                        .font(.system(size: 54))
-                        .foregroundColor(.secondary.opacity(0.6))
-                    
-                    Text(isCompleted ? "No habits completed yet." : "Build your first great habit!")
-                        .font(.system(size: 22, weight: .bold, design: .rounded))
-                        .foregroundColor(.primary)
-                        .multilineTextAlignment(.center)
-                    
-                    if !isCompleted {
-                        Button(action: {
-                            self.showingAddHabitSheet = true
-                        }) {
-                            HStack(spacing: 8) {
-                                Image(systemName: "plus.circle.fill")
-                                    .font(.system(size: 18))
-                                Text("Add a Habit")
-                                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                            }
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 24)
-                            .padding(.vertical, 12)
-                            .background(
-                                Capsule()
-                                    .fill(LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing))
-                                    .shadow(color: .blue.opacity(0.4), radius: 10, x: 0, y: 5)
-                            )
-                        }
-                    }
-                    Spacer()
-                }
-                .padding()
-            } else {
-                List {
-                    // Mood Tracker & Power Score Header Section (Only in Active view)
-                    if !isCompleted {
-                        Section {
-                            // Mood & Energy Tracker Card
-                            MoodTrackerCardView()
-                                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 4, trailing: 16))
-                                .listRowBackground(Color.clear)
-                                .listRowSeparator(.hidden)
-                            
-                            // Daily Power Score & Wisdom Card
-                            VStack(alignment: .leading, spacing: 10) {
-                                HStack {
-                                    HStack(spacing: 6) {
-                                        Image(systemName: "bolt.fill")
-                                            .foregroundColor(.yellow)
-                                        Text("DAILY POWER SCORE")
-                                            .font(.system(size: 10, weight: .heavy, design: .rounded))
-                                            .foregroundColor(.white.opacity(0.8))
-                                            .tracking(1.2)
-                                    }
-                                    Spacer()
-                                    Text("\(habitStore.dailyPowerScore)%")
-                                        .font(.system(size: 15, weight: .heavy, design: .rounded))
-                                        .foregroundColor(.white)
-                                }
-                                
-                                GeometryReader { geo in
-                                    ZStack(alignment: .leading) {
-                                        Capsule()
-                                            .fill(Color.white.opacity(0.2))
-                                            .frame(height: 6)
-                                        Capsule()
-                                            .fill(Color.white)
-                                            .frame(width: max(6, geo.size.width * CGFloat(habitStore.dailyPowerScore) / 100.0), height: 6)
-                                    }
-                                }
-                                .frame(height: 6)
-                                
-                                Text("\"\(habitStore.dailyMotivationQuote.quote)\"")
-                                    .font(.system(size: 12, weight: .medium, design: .serif))
-                                    .foregroundColor(.white.opacity(0.95))
-                                    .italic()
-                                
-                                Text("— \(habitStore.dailyMotivationQuote.author)")
-                                    .font(.system(size: 10, weight: .bold, design: .rounded))
-                                    .foregroundColor(.white.opacity(0.75))
-                            }
-                            .padding(16)
-                            .background(
-                                LinearGradient(
-                                    colors: [Color.indigo, Color.purple, Color.blue],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                            .threeDCardEffect(maxTilt: 10, isInteractive: true, cornerRadius: 18)
-                            .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 8, trailing: 16))
-                            .listRowBackground(Color.clear)
-                            .listRowSeparator(.hidden)
-                        }
-                    }
-                    
-                    // Habits List Items
-                    Section {
-                        ForEach(sortedHabits, id: \.id) { habit in
-                            NavigationLink(
-                                destination: HabitDetailView()
-                                    .environmentObject(habit)
-                                    .environmentObject(habitStore)
-                            ) {
-                                HabitRow(habit: habit)
-                                    .environmentObject(habitStore)
-                            }
-                            .padding(.vertical, 4)
-                            .listRowBackground(
-                                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .fill(Color(.secondarySystemGroupedBackground))
-                                    .padding(.vertical, 4)
-                            )
-                            .listRowSeparator(.hidden)
-                            .threeDCardEffect(maxTilt: 8, isInteractive: false, cornerRadius: 16)
-                            .swipeActions(edge: .leading) {
-                                Button {
-                                    habitStore.toggleHabitQuick(habit)
-                                } label: {
-                                    Label(
-                                        habit.isHabitCompleted ? "Unmark" : "Complete",
-                                        systemImage: habit.isHabitCompleted ? "arrow.uturn.backward" : "checkmark"
-                                    )
-                                }
-                                .tint(habit.isHabitCompleted ? .gray : .green)
-                            }
-                            .swipeActions(edge: .trailing) {
-                                Button(role: .destructive) {
-                                    selectedHabit = habit
-                                    self.showDeleteConfirmationAlert = true
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                            }
-                        }
-                    }
-                }
-                .listStyle(.plain)
+                .padding(.vertical, 12)
             }
         }
         .searchable(text: $searchKeyword, prompt: "Search habits...")
@@ -335,6 +383,38 @@ struct HabitListView: View {
         } message: {
             Text("You have \(habitStore.streakShieldsCount) shields remaining. Shields prevent streak resets if you miss completing a habit.")
         }
+        .sheet(isPresented: $showReflectionSheet) {
+            VStack(spacing: 20) {
+                Text("Daily Reflection")
+                    .font(.system(size: 24, weight: .bold, design: .serif))
+                    .foregroundColor(Color(hex: "#2B2420"))
+                    .padding(.top, 20)
+                
+                Text("\"\(habitStore.dailyMotivationQuote.quote)\"")
+                    .font(.system(size: 17, design: .serif))
+                    .foregroundColor(Color(hex: "#2B2420"))
+                    .italic()
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                
+                Text("— \(habitStore.dailyMotivationQuote.author)")
+                    .font(.system(size: 14, weight: .semibold, design: .serif))
+                    .foregroundColor(Color(hex: "#D4A359"))
+                
+                Spacer()
+                
+                Button("Close") {
+                    showReflectionSheet = false
+                }
+                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+                .padding(.horizontal, 32)
+                .padding(.vertical, 14)
+                .background(Capsule().fill(Color(hex: "#244E3F")))
+                .padding(.bottom, 20)
+            }
+            .presentationDetents([.medium])
+        }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
@@ -344,7 +424,7 @@ struct HabitListView: View {
                         .font(.system(size: 14, weight: .bold))
                         .foregroundColor(.white)
                         .padding(8)
-                        .background(Circle().fill(LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing)))
+                        .background(Circle().fill(Color(hex: "#244E3F")))
                 }
             }
         }
@@ -354,23 +434,33 @@ struct HabitListView: View {
             }
             .environmentObject(newHabit)
         }
-        .sheet(item: Binding(
-            get: { selectedRoutineForFlow.map { IdentifiableString(id: $0) } },
-            set: { selectedRoutineForFlow = $0?.id }
-        )) { item in
-            RoutineStackFlowView(stackName: item.id)
-                .environmentObject(habitStore)
+    }
+    
+    private func quickAccessCard(icon: String, title: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: {
+            SoundHapticManager.shared.lightImpact()
+            action()
+        }) {
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 20))
+                    .foregroundColor(color)
+                
+                Text(title)
+                    .font(.system(size: 11, weight: .bold, design: .serif))
+                    .foregroundColor(Color(hex: "#2B2420"))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .noorCard(cornerRadius: 14)
         }
+        .buttonStyle(.plain)
     }
     
     private func addHabit() {
         habitStore.addHabit(newHabit)
         newHabit = Habit()
     }
-}
-
-struct IdentifiableString: Identifiable {
-    let id: String
 }
 
 struct HabitListView_Previews: PreviewProvider {

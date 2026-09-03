@@ -1,8 +1,6 @@
 //
 //  HabitStore.swift
-//  HabitTracker
-//
-//  Created by Saikat Kumar Dey on 08/07/23.
+//  HabitHub
 //
 
 import SwiftUI
@@ -29,7 +27,7 @@ struct HabitMoodEntry: Identifiable, Codable {
 
 class HabitStore: ObservableObject {
     
-    private let accessQueue = DispatchQueue(label: "com.saikatkumardey.habittracker.habitstore")
+    private let accessQueue = DispatchQueue(label: "com.aarchi.habithub.habitstore")
     private let moodStorageKey = "habit_mood_entries"
     private let shieldStorageKey = "habit_streak_shields"
     
