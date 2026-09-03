@@ -94,9 +94,3 @@ A next-generation, immersive habit-tracking iOS app built with **SwiftUI**, feat
    xcrun simctl install booted ./build/Build/Products/Debug-iphonesimulator/HabitTracker.app
    xcrun simctl launch booted com.saikatkumardey.indiehabits
    ```
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License. Feel free to use and modify it!
